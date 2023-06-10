@@ -100,7 +100,7 @@ function createFormCreateTemplate (point) {
 
         <div class="event__available-offers">`;
 
-  point.offers .forEach((element, index) => {
+  point.offers.forEach((element, index) => {
     result += `<div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="${index}" type="checkbox" name="event-offer-luggage" checked>
     <label class="event__offer-label" for="${index}">
@@ -136,24 +136,25 @@ function createFormCreateTemplate (point) {
 }
 
 
-export default class NewFormCreateView {
+export default class FormCreateView {
+  #element = null;
 
   constructor(point) {
     this.point = point;
   }
 
-  getTemplate() {
+  get template() {
     return createFormCreateTemplate(this.point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

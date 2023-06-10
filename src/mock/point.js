@@ -1,4 +1,4 @@
-const pointTypes = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+export const TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 export const genereatePoint = (destination, offers) => ({
   basePrice: 12345,
@@ -7,5 +7,5 @@ export const genereatePoint = (destination, offers) => ({
   destination: destination,
   id: 0,
   offers: offers.offers,
-  type: pointTypes[Math.floor(Math.random() * pointTypes.length)]
+  type: TYPES[Math.floor(Math.random() * TYPES.length)]
 });
