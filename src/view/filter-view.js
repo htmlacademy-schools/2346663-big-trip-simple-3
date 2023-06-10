@@ -14,21 +14,22 @@ const createFilterTemplate = () => `<form class="trip-filters" action="#" method
 <button class="visually-hidden" type="submit">Accept filter</button>
 </form>`;
 
-export default class NewFilterView {
+export default class FilterView {
+  #element = null;
 
-  getTemplate() {
+  get template() {
     return createFilterTemplate();
   }
 
-  getElement() {
-    if (!this.elemnt) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
