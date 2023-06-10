@@ -8,6 +8,7 @@ import { render } from '../render';
 
 import PointsModel from '../model/points-model';
 
+import EmptyListView from '../view/empty-list-view';
 export default class Presenter {
 
   #list = new ListView();
@@ -18,8 +19,14 @@ export default class Presenter {
     render(new SortView(), this.container);
     render(this.#list, this.container);
 
-    for (const point of (new PointsModel).points) {
-      this.#renderPoint(point);
+    const points = (new PointsModel).points;
+
+    if (points.length !== 0) {
+      for (const point of points) {
+        this.#renderPoint(point);
+      }
+    } else {
+      render(new EmptyListView, this.#list.element);
     }
   };
 
