@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
 function createFormEditTemplate (point) {
 
@@ -129,10 +129,9 @@ function createFormEditTemplate (point) {
   return result;
 }
 
-export default class FormEditView {
-  #element = null;
-
+export default class FormEditView extends AbstractView {
   constructor(point) {
+    super();
     this.point = point;
   }
 
@@ -140,14 +139,23 @@ export default class FormEditView {
     return createFormEditTemplate(this.point);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#submitHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
+  };
+
+  #submitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

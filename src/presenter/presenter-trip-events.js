@@ -4,7 +4,7 @@ import ListView from '../view/list-view';
 import FormEditView from '../view/form-edit-view';
 import PointView from '../view/point-view';
 
-import { render } from '../render';
+import {render} from '../framework/render';
 
 import PointsModel from '../model/points-model';
 
@@ -50,17 +50,16 @@ export default class Presenter {
       }
     };
 
-    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    pointComponent.setClickHandler(() => {
       replacePointToForm();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    pointEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    pointEditComponent.setClickHandler(() => {
       replaceFormToPoint();
       document.removeEventListener('keydown', onEscKeyDown);
     });
-    pointEditComponent.element.querySelector('form').addEventListener('submit', (evt) => {
-      evt.preventDefault();
+    pointEditComponent.setSubmitHandler(() => {
       replaceFormToPoint();
       document.removeEventListener('keydown', onEscKeyDown);
     });

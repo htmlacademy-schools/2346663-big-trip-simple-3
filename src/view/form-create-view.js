@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
 function createFormCreateTemplate (point) {
   let result = `<li class="trip-events__item">
@@ -135,26 +135,13 @@ function createFormCreateTemplate (point) {
   return result;
 }
 
-
-export default class FormCreateView {
-  #element = null;
-
+export default class FormCreateView extends AbstractView {
   constructor(point) {
+    super();
     this.point = point;
   }
 
   get template() {
     return createFormCreateTemplate(this.point);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
