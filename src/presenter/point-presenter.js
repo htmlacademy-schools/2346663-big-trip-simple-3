@@ -1,6 +1,6 @@
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
-import {render, replace} from '../framework/render';
+import {remove, render, replace} from '../framework/render';
 
 const MODE = {
   DEFAULT: 'DEFAULT',
@@ -66,5 +66,10 @@ export default class PointPresenter {
       this.#replaceFormToPoint();
       document.removeEventListener('keydown', this.#onEscKeyDown);
     }
+  };
+
+  destroy = () => {
+    remove(this.#pointComponent);
+    remove(this.#pointEditComponent);
   };
 }
