@@ -1,6 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import { genereateDestination } from '../mock/destination';
 import { humanizeDateInSimpleDate } from '../util';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createFormEditTemplate (point) {
 
@@ -134,11 +136,14 @@ function createFormEditTemplate (point) {
 }
 
 export default class FormEditView extends AbstractStatefulView {
+  #datepickers = [];
+
   constructor(point) {
     super();
     this._state = FormEditView.parsePointToState(point);
 
     this.#setInnerHandlers();
+    this.#setDatepickers();
   }
 
   get template() {
@@ -191,6 +196,7 @@ export default class FormEditView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setClickHandler(this._callback.click);
     this.setSubmitHandler(this._callback.formSubmit);
+    this.#setDatepickers();
   };
 
   #textInputHandler = (evt) => {
@@ -206,6 +212,48 @@ export default class FormEditView extends AbstractStatefulView {
       case 'event-price-1':
         this._setState({basePrice: target.value});
         break;
+    }
+  };
+
+  #setDatepickers = () => {
+    this.#datepickers = [
+      flatpickr(
+        this.element.querySelector('#event-start-time-1'),
+        {
+          enableTime: true,
+          'time_24hr': true,
+          dateFormat: 'm/d/y H:i',
+          defaultDate: this._state.dateFrom,
+          onChange: this.#dateFromChangeHandler
+        }
+      ),
+      flatpickr(
+        this.element.querySelector('#event-end-time-1'),
+        {
+          enableTime: true,
+          'time_24hr': true,
+          dateFormat: 'd/m/y H:i',
+          defaultDate: this._state.dateTo,
+          onChange: this.#dateToChangeHandler
+        }
+      )
+    ];
+  };
+
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({dateFrom: userDate});
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({dateTo: userDate});
+  };
+
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#datepickers) {
+      this.#datepickers.forEach((el) => el.destroy());
+      this.#datepickers = [];
     }
   };
 }
