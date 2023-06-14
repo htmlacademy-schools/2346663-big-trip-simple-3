@@ -22,8 +22,8 @@ function createPointTemplate (point) {
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">`;
-  if (point.offers) {
-    for (const offer of point.offers) {
+  if (point.offers.offers) {
+    for (const offer of point.offers.offers) {
       result += `<li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;

@@ -1,4 +1,6 @@
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
+import { genereateDestination } from '../mock/destination';
+import { humanizeDateInSimpleDate } from '../util';
 
 function createFormEditTemplate (point) {
 
@@ -8,7 +10,7 @@ function createFormEditTemplate (point) {
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${point.type}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -66,9 +68,9 @@ function createFormEditTemplate (point) {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          Flight
+          ${point.type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${point.destination.name} list="destination-list-1" autocomplete="off">
         <datalist id="destination-list-1">
           <option value="Amsterdam"></option>
           <option value="Geneva"></option>
@@ -78,10 +80,10 @@ function createFormEditTemplate (point) {
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDateInSimpleDate(point.dateFrom)}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDateInSimpleDate(point.dateTo)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -89,7 +91,7 @@ function createFormEditTemplate (point) {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="160">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.basePrice}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -104,8 +106,9 @@ function createFormEditTemplate (point) {
 
         <div class="event__available-offers">`;
 
-  point.offers.forEach((element, index) => {
-    result += `<div class="event__offer-selector">
+  point.offers.offers.forEach((element, index) => {
+    if (point.type === point.offers.type) {
+      result += `<div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="${index}" type="checkbox" name="event-offer-luggage" checked>
     <label class="event__offer-label" for="${index}">
       <span class="event__offer-title">${element.title}</span>
@@ -113,6 +116,7 @@ function createFormEditTemplate (point) {
       <span class="event__offer-price">${element.price}</span>
     </label>
   </div>`;
+    }
   });
 
   result += `        </div>
@@ -129,14 +133,16 @@ function createFormEditTemplate (point) {
   return result;
 }
 
-export default class FormEditView extends AbstractView {
+export default class FormEditView extends AbstractStatefulView {
   constructor(point) {
     super();
-    this.point = point;
+    this._state = FormEditView.parsePointToState(point);
+
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createFormEditTemplate(this.point);
+    return createFormEditTemplate(this._state);
   }
 
   setSubmitHandler = (callback) => {
@@ -157,5 +163,49 @@ export default class FormEditView extends AbstractView {
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  };
+
+  static parsePointToState = (point) => ({...point});
+
+  static parseStateToPoint = (state) => ({...state});
+
+  #typeToggleHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({type: evt.target.textContent.toLowerCase()});
+  };
+
+  #destinationToggleHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({destination: genereateDestination(evt.target.value)});
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-group').addEventListener('click', this.#typeToggleHandler);
+    this.element.querySelector('#event-destination-1').addEventListener('change', this.#destinationToggleHandler);
+    this.element.querySelector('#event-start-time-1').addEventListener('input', this.#textInputHandler);
+    this.element.querySelector('#event-end-time-1').addEventListener('input', this.#textInputHandler);
+    this.element.querySelector('#event-price-1').addEventListener('input', this.#textInputHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setClickHandler(this._callback.click);
+    this.setSubmitHandler(this._callback.formSubmit);
+  };
+
+  #textInputHandler = (evt) => {
+    evt.preventDefault();
+    const target = evt.target;
+    switch (target.id) {
+      case 'event-start-time-1':
+        this._setState({dateFrom: humanizeDateInSimpleDate(target.value)});
+        break;
+      case 'event-end-time-1':
+        this._setState({dateTo: humanizeDateInSimpleDate(target.value)});
+        break;
+      case 'event-price-1':
+        this._setState({basePrice: target.value});
+        break;
+    }
   };
 }
