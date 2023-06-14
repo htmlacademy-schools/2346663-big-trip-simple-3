@@ -100,7 +100,7 @@ function createFormCreateTemplate (point) {
 
         <div class="event__available-offers">`;
 
-  point.offers.forEach((element, index) => {
+  point.offers.offers.forEach((element, index) => {
     result += `<div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="${index}" type="checkbox" name="event-offer-luggage" checked>
     <label class="event__offer-label" for="${index}">

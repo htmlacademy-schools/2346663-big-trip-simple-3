@@ -4,12 +4,12 @@ import { genereateOffers } from '../mock/offer.js';
 
 export default class PointsModel {
   #points = [
-    genereatePoint(genereateDestination(), genereateOffers(), 0),
-    genereatePoint(genereateDestination(), genereateOffers(), 1),
-    genereatePoint(genereateDestination(), genereateOffers(), 2),
-    genereatePoint(genereateDestination(), genereateOffers(), 3),
-    genereatePoint(genereateDestination(), genereateOffers(), 4),
-    genereatePoint(genereateDestination(), genereateOffers(), 5)
+    genereatePoint(genereateDestination('Chamonix'), genereateOffers(), 0),
+    genereatePoint(genereateDestination('Chamonix'), genereateOffers(), 1),
+    genereatePoint(genereateDestination('Chamonix'), genereateOffers(), 2),
+    genereatePoint(genereateDestination('Chamonix'), genereateOffers(), 3),
+    genereatePoint(genereateDestination('Chamonix'), genereateOffers(), 4),
+    genereatePoint(genereateDestination('Chamonix'), genereateOffers(), 5)
   ];
 
   get points() {

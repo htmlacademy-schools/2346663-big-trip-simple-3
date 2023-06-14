@@ -4,6 +4,8 @@ export const humanizeDateInDayOfTheMonth = (date) => dayjs(date).format('D MMM')
 
 export const humanizeDateInTime = (date) => dayjs(date).format('HH:mm');
 
+export const humanizeDateInSimpleDate = (date) => dayjs(date).format('DD/MM/YY HH:mm');
+
 const dateInNumber = (date) => dayjs(date).format('YYYYMMDDHHmm');
 
 export const sortByDay = (pointA, pointB) => dateInNumber(pointA.dateFrom) - dateInNumber(pointB.dateFrom);
