@@ -1,57 +1,51 @@
+import { FilterType } from './const';
 import dayjs from 'dayjs';
-import { SortType, FilterType, MODEL_DATE_FORMAT } from './mock/const.js';
 
-export const getRandomInt = (upperBound = 100) => (Math.floor(Math.random() * upperBound));
+const getDate = (date) => dayjs(date).format('MMM D');
+const getTime = (date) => dayjs(date).format('HH-mm');
+const getFullDataTime = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 
-export const getFormattedDate = (eventDate, format = MODEL_DATE_FORMAT) => dayjs(eventDate).format(format);
-
-export const turnModelDateToFramework = (date) => dayjs(date).format('DD/MM/YY HH:mm');
-
-export const isEventUpcoming = (date) => !dayjs(date).isBefore(dayjs(), 'day');
-
-export const compareDates = (a, b) => dayjs(a).diff(dayjs(b)) < 0;
-
-export const getMockText = (len) => {
-  const mockText = `
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-  commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-  cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-  est laborum.`;
-  return mockText.slice(0, len);
-};
-
-export const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
+const getWeightForNullDate = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return 0;
   }
 
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
+  if (dateA === null) {
+    return 1;
+  }
+
+  if (dateB === null) {
+    return -1;
+  }
+
+  return null;
 };
 
-export const filter = {
+const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'm');
+
+const sortDays = (pointA, pointB) => {
+  const weight = getWeightForNullDate(pointA.dateFrom, pointB.dateFrom);
+
+  return weight ?? dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
+};
+
+const sortPrices = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
+
+const isDateFuture = (date) => {
+  const currentDate = dayjs();
+  const targetDate = dayjs(date);
+  return targetDate.isAfter(currentDate, 'm');
+};
+
+const filter = {
   [FilterType.EVERYTHING]: (points) => points,
-  [FilterType.FUTURE]: (points) => points.filter((point) => isEventUpcoming(point.date_from)),
+  [FilterType.FUTURE]: (points) => points.filter((point) => isDateFuture(point.dateTo)),
 };
 
-export const sort = {
-  [SortType.DAY]: (points) => points,
-  [SortType.EVENT]: (points) => points,
-  [SortType.TIME]: (points) => points,
-  [SortType.PRICE]: (points) => points,
-  [SortType.OFFERS]: (points) => points,
+const isFormValid = (state, availableDestinations) => {
+  const allIds = Object.keys(availableDestinations);
+
+  return (allIds.includes(`${state.destination - 1}`) && /^\d+$/.test(state.basePrice));
 };
 
-export const sortPointsByDay = (pa, pb) => dayjs(pa.date_from).toDate() - dayjs(pb.date_from).toDate();
-
-export const sortPointsByPrice = (pa, pb) => pb.base_price - pa.base_price;
-
-export const getIdFromTag = (tag) => +tag.id.split('-').slice(-1);
+export { isFormValid, filter, isDatesEqual, sortDays, sortPrices, getDate, getTime, getFullDataTime };
