@@ -1,16 +1,43 @@
-import FilterFormView from './view/filter-view.js';
-import TripPresenter from './presenter/presenter-trip-events.js';
-import {render} from './framework/render.js';
-import PointsModel from './model/points-model.js';
-import { generateFilter } from './mock/mock.js';
+import { render } from './framework/render.js';
+import ListPresenter from './presenter/presenter-trip-events.js';
+import TripModel from './model/points-model.js';
+import FilterModel from './model/filter-model.js';
+import FilterPresenter from './presenter/filter-presenter.js';
+import NewPointButtonView from './view/new-point-button-view.js';
+import PointsApiService from './pointsApiService.js';
 
-const tripEventsContainer = document.querySelector('.trip-events');
-const filterFormContainer = document.querySelector('.trip-controls__filters');
+const AUTHORIZATION = 'Basic rtvuus89dgufs';
+const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';
 
-const pointsModel = new PointsModel();
-const tripPointsPresenter = new TripPresenter(tripEventsContainer, pointsModel);
+const filtersContainer = document.querySelector('.trip-controls__filters');
+const pointsContainer = document.querySelector('.trip-events');
+const buttonContainer = document.querySelector('.trip-main');
 
-const filters = generateFilter(pointsModel.points);
+const tripPointsModel = new TripModel(new PointsApiService(END_POINT, AUTHORIZATION));
+const filterModel = new FilterModel();
 
-render(new FilterFormView(filters), filterFormContainer);
-tripPointsPresenter.init();
+const tripPresenter = new ListPresenter(pointsContainer, tripPointsModel, filterModel);
+tripPresenter.init();
+const filterPresenter = new FilterPresenter(filtersContainer, filterModel, tripPointsModel);
+
+filterPresenter.init();
+
+const newPointButtonComponent = new NewPointButtonView();
+
+const handleNewPointFormClose = () => {
+  newPointButtonComponent.element.disabled = false;
+};
+
+const handleNewPointButtonClick = () => {
+  tripPresenter.createPoint(handleNewPointFormClose);
+  newPointButtonComponent.element.disabled = true;
+};
+
+tripPointsModel.init()
+  .catch(() => {
+    newPointButtonComponent.element.disabled = true;
+  })
+  .finally(() => {
+    render(newPointButtonComponent, buttonContainer);
+    newPointButtonComponent.setClickHandler(handleNewPointButtonClick);
+  });
